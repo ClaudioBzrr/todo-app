@@ -3,6 +3,8 @@
 import { Box, Checkbox, Flex, FormControl, Heading, Input, InputGroup, InputLeftAddon, InputLeftElement, Stack, Text, useColorModeValue } from '@chakra-ui/react'
 import { ChangeEvent, FormEvent, useState } from 'react'
 import {AiOutlinePlus} from 'react-icons/ai'
+
+
 export default function Home() {
   interface ITask{
     name:string,
@@ -24,7 +26,11 @@ export default function Home() {
     const selectedItem = itemsUpdate.find((e,index) => index ==  Number(value))!
     selectedItem.finished = checked
     setitems(itemsUpdate)
-    console.log(selectedItem.finished)
+  }
+
+  function handleWriteTask(event:ChangeEvent<HTMLInputElement>){
+    const {value} = event.target
+    setCurrentValue(value)
   }
 
   return (
@@ -46,7 +52,7 @@ export default function Home() {
                     <Input 
                       type='text'
                       value={currentValue}
-                      onChange={e => setCurrentValue(e.target.value)}
+                      onChange={e => handleWriteTask(e)}
                     />
                   </InputGroup>
                 </Stack>
@@ -54,7 +60,22 @@ export default function Home() {
             </form>
             {
               items.map(({name,finished},index) =>(
-                <Checkbox as={finished == false ? 'abbr' : 'del'} checked={finished == true ? true : false} fontStyle={'oblique'} onChange={e => handleFinishTask(e)} rounded={'full'} key={index} value={index}>{name}</Checkbox>
+                <Checkbox
+                  defaultChecked={finished}
+                  fontStyle={'oblique'} 
+                  onChange={e => handleFinishTask(e)} 
+                  rounded={'full'}
+                  key={index} 
+                  value={index}
+                >
+                    {
+                      finished === true ?(
+                        <Text as={'del'}>{name}</Text>
+                      ):(
+                        <Text>{name}</Text>
+                      )
+                    }
+                </Checkbox>
               ))
             }
           </Stack>
