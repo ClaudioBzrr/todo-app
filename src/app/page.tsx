@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Checkbox, Flex, FormControl, FormLabel, Heading, Input, InputGroup, InputLeftAddon, InputLeftElement, Stack, Text, useColorModeValue } from '@chakra-ui/react'
+import { Box, Checkbox, Flex, FormControl, Heading, Input, InputGroup, InputLeftAddon, InputLeftElement, Stack, Text, useColorModeValue } from '@chakra-ui/react'
 import { ChangeEvent, FormEvent, useState } from 'react'
 import {AiOutlinePlus} from 'react-icons/ai'
 export default function Home() {
@@ -12,9 +12,19 @@ export default function Home() {
   const [currentValue,setCurrentValue] = useState<string>('')
 
 
-  function handleSubmitTask(event:FormEvent<HTMLInputElement>){
-    console.log('test')
+  function handleSubmitTask(event:FormEvent<HTMLFormElement>){
+    event.preventDefault()
     setitems([...items,{name:currentValue,finished:false}])
+    setCurrentValue('')
+  }
+
+  function handleFinishTask(event:ChangeEvent<HTMLInputElement>){
+    const {checked,value} = event.target
+    const itemsUpdate =  items
+    const selectedItem = itemsUpdate.find((e,index) => index ==  Number(value))!
+    selectedItem.finished = checked
+    setitems(itemsUpdate)
+    console.log(selectedItem.finished)
   }
 
   return (
@@ -26,26 +36,25 @@ export default function Home() {
         </Stack>
         <Box boxShadow={'lg'} rounded={'lg'} p={8} bg={useColorModeValue('white','gray.700')}>
           <Stack>
-            <FormControl>
-              <Stack direction={'row'}>
-                <InputGroup variant={'flushed'}>
-                  <InputLeftElement>
-                    <AiOutlinePlus size={24}/>
-                  </InputLeftElement>
-                  <Input 
-                    type='text'
-                    value={currentValue}
-                    onChange={e => setCurrentValue(e.target.value)}
-                    onSubmit={e => handleSubmitTask(e)}
-                  />
-                </InputGroup>
-              </Stack>
-            </FormControl>
+            <form onSubmit={e => handleSubmitTask(e)}>
+              <FormControl>
+                <Stack direction={'row'}>
+                  <InputGroup variant={'flushed'}>
+                    <InputLeftElement>
+                      <AiOutlinePlus size={24}/>
+                    </InputLeftElement>
+                    <Input 
+                      type='text'
+                      value={currentValue}
+                      onChange={e => setCurrentValue(e.target.value)}
+                    />
+                  </InputGroup>
+                </Stack>
+              </FormControl>
+            </form>
             {
               items.map(({name,finished},index) =>(
-                <Box p={8}>
-                    <Checkbox rounded={'full'} key={index} isChecked ={finished}>{name}</Checkbox>
-                </Box>
+                <Checkbox as={finished == false ? 'abbr' : 'del'} checked={finished == true ? true : false} fontStyle={'oblique'} onChange={e => handleFinishTask(e)} rounded={'full'} key={index} value={index}>{name}</Checkbox>
               ))
             }
           </Stack>
